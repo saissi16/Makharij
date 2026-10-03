@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مخارج الحروف — تعلّم النطق الصحيح</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF3F0; --surface:#FFFFFF; --ink:#0F2A26; --ink2:#35514C; --line:#B7CAC3;
+  --pri:#0B5D55; --pri-d:#08443E; --gold:#8A6208; --goldbg:#FBF1D6;
+  --ok:#1E6B34; --okbg:#E3F3E7; --bad:#A4281C; --badbg:#FCE9E6; --near:#7A4B00; --nearbg:#FFF0D1;
+  --fs:22px;
+}
+*{box-sizing:border-box}
+html{font-size:var(--fs);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;line-height:1.8;padding-bottom:6.2rem}
+.quran{font-family:"Amiri","Traditional Arabic","Scheherazade New",serif;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.4}
+p{margin:.4rem 0}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:var(--pri);color:#fff;padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;border-bottom:4px solid var(--gold)}
+.top h1{font-size:1.15rem;font-weight:700}
+.top small{display:block;font-size:.8rem;opacity:.9;font-weight:400}
+.fsb{display:flex;gap:.4rem}
+.fsb button{width:3.2rem;height:3.2rem;border-radius:.6rem;border:2px solid #fff;background:transparent;color:#fff;font-weight:700;font-size:1rem}
+.fsb button:hover{background:rgba(255,255,255,.18)}
+
+/* tab bar */
+.tabs{position:fixed;inset:auto 0 0 0;z-index:30;background:#fff;border-top:3px solid var(--pri);display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs button{border:0;background:#fff;padding:.5rem .2rem .45rem;display:flex;flex-direction:column;align-items:center;gap:.1rem;min-height:4.6rem;font-weight:700;font-size:.85rem;color:var(--ink2)}
+.tabs svg{width:1.7rem;height:1.7rem;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button[aria-current="true"]{background:var(--pri);color:#fff}
+
+main{max-width:68rem;margin:0 auto;padding:1rem}
+.lead{color:var(--ink);font-size:1rem;font-weight:500;margin:.2rem 0 1rem}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:1rem;padding:1rem 1.1rem;margin-bottom:1rem}
+.card h2{font-size:1.25rem;color:var(--pri-d);margin-bottom:.3rem}
+.card h3{font-size:1.05rem;margin:1rem 0 .4rem;color:var(--pri-d)}
+
+.btn{min-height:3.6rem;padding:.55rem 1.1rem;border-radius:.8rem;border:2px solid var(--pri);background:#fff;color:var(--pri);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:.5rem}
+.btn:hover{background:#E4F0EC}
+.btn.pri{background:var(--pri);color:#fff}
+.btn.pri:hover{background:var(--pri-d)}
+.btn.rec{background:var(--pri);color:#fff;min-height:4.4rem;font-size:1.15rem;width:100%}
+.btn.rec.live{background:var(--bad);border-color:var(--bad)}
+.btn svg{width:1.3rem;height:1.3rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btns{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+
+.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 .8rem}
+.pill{min-height:3.4rem;font-size:1rem;padding:.3rem 1rem;border-radius:2rem;border:2px solid var(--pri);background:#fff;color:var(--pri);font-weight:600}
+.pill[aria-pressed="true"]{background:var(--pri);color:#fff}
+
+/* map */
+.mapgrid{display:grid;gap:1rem}
+@media(min-width:900px){.mapgrid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}.mapgrid .stick{position:sticky;top:5rem}}
+.diaWrap{background:#fff;border:2px solid var(--line);border-radius:1rem;padding:.5rem}
+.dia{display:block;width:100%;height:auto;max-height:68vh;margin:0 auto}
+.dia .head{fill:#EFE9DF;stroke:#35514C;stroke-width:4;stroke-linejoin:round}
+.zone{cursor:pointer;opacity:.9}
+.zone ellipse,.zone rect,.zone path{stroke:#35514C;stroke-width:2.5}
+.z-nose ellipse{fill:#BFE0EE}
+.z-jawf ellipse{fill:#DCEBC6;stroke-dasharray:8 6}
+.z-throat rect{fill:#F4CBA7}
+.z-tongue path{fill:#F2A9A5}
+.z-lips ellipse{fill:#E58B8B}
+.zone.sel{opacity:1}
+.zone.sel ellipse,.zone.sel rect,.zone.sel path{stroke:var(--gold);stroke-width:6;stroke-dasharray:none}
+.zone:not(.sel):hover{opacity:1}
+.dia .lbl{font-size:23px;font-weight:700;fill:#0F2A26;font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;paint-order:stroke;stroke:#fff;stroke-width:5px;pointer-events:none}
+.mark{pointer-events:none}
+.mark .pt{fill:var(--pri);stroke:#fff;stroke-width:2.5}
+.mark .ring{fill:none;stroke:var(--pri);stroke-width:4;transform-box:fill-box;transform-origin:center;animation:pulse 1.6s ease-out 3}
+@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.4);opacity:.3}}
+.mini .zone{pointer-events:none}
+.mini .dia{max-height:38vh}
+.grpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.2rem,1fr));gap:.6rem;margin:.4rem 0 .9rem}
+.grpbtn{min-height:3.6rem;border-radius:.9rem;border:3px solid var(--pri);background:#fff;color:var(--pri-d);font-weight:700;font-size:1.05rem}
+.grpbtn[aria-pressed="true"]{background:var(--pri);color:#fff}
+.rows{display:grid;gap:.5rem}
+.row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;text-align:right;min-height:4rem;padding:.4rem .9rem;border:2px solid var(--line);border-radius:.8rem;background:#fff}
+.row.sel{border-color:var(--pri);background:#E4F0EC;box-shadow:inset -6px 0 0 var(--pri)}
+.row .rn{font-weight:600;font-size:1rem}
+.row .rl{font-size:1.6rem;color:var(--pri-d);white-space:nowrap}
+
+.letters{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.6rem}
+.lbtn{width:4.8rem;height:4.8rem;border-radius:1rem;border:2px solid var(--gold);background:var(--goldbg);color:var(--ink);font-size:2.7rem;display:flex;align-items:center;justify-content:center}
+.lbtn:hover{background:#F6E3B0}
+
+/* letters grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(5.6rem,1fr));gap:.7rem}
+.tile{display:flex;flex-direction:column;align-items:center;gap:0;border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.4rem .2rem .5rem;min-height:7rem}
+.tile:hover{border-color:var(--gold);background:var(--goldbg)}
+.tile .quran{font-size:2.6rem;line-height:1.3}
+.tile small{font-size:.95rem;color:var(--ink2);font-weight:500}
+.stars{font-size:1rem;color:var(--gold);letter-spacing:1px}
+
+/* modal */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(10,30,26,.65);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.ov{align-items:center}}
+.sheet{background:var(--bg);width:100%;max-width:42rem;max-height:94vh;overflow:auto;border-radius:1.2rem 1.2rem 0 0;padding:1rem 1.1rem 1.4rem;position:relative}
+@media(min-width:700px){.sheet{border-radius:1.2rem}}
+.close{position:sticky;top:0;float:left;width:3rem;height:3rem;border-radius:50%;border:2px solid var(--ink);background:#fff;font-size:1.6rem;line-height:1;z-index:2}
+.lhead{display:flex;align-items:center;gap:1rem;margin-bottom:.4rem}
+.big{width:6rem;height:6rem;flex:none;border-radius:1.2rem;background:var(--goldbg);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:4.2rem}
+.exword{display:flex;align-items:center;justify-content:space-between;gap:.8rem;background:#fff;border:2px solid var(--line);border-radius:1rem;padding:.5rem 1rem}
+.exword .quran{font-size:2.4rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{min-height:3.1rem;padding:.2rem 1rem;border-radius:.7rem;border:2px solid var(--pri);background:#fff;color:var(--pri-d);font-weight:600;font-size:1rem}
+.chip[aria-pressed="true"]{background:var(--pri);color:#fff}
+.defbox{margin-top:.6rem;padding:.6rem .9rem;border-radius:.8rem;background:#fff;border:2px dashed var(--pri);font-size:.95rem;min-height:3rem}
+.tipbox{margin-top:.8rem;padding:.7rem .9rem;border-radius:.8rem;background:var(--goldbg);border-right:6px solid var(--gold);font-size:.95rem}
+
+/* mic */
+.meter{height:.7rem;border-radius:1rem;background:#D5E2DD;margin:.7rem 0;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--pri);transition:width .08s}
+.verdict{margin-top:.6rem;padding:.7rem .9rem;border-radius:.8rem;font-size:.97rem;border:2px solid}
+.verdict.great{background:var(--okbg);border-color:var(--ok);color:#10431F}
+.verdict.close{background:var(--nearbg);border-color:var(--near);color:#4A2D00}
+.verdict.miss,.verdict.err{background:var(--badbg);border-color:var(--bad);color:#6B140C}
+.verdict.info{background:#fff;border-color:var(--line)}
+.fine{font-size:.9rem;color:var(--ink2);margin-top:.5rem}
+audio{width:100%;margin-top:.6rem}
+
+/* coach */
+.bar{height:.8rem;border-radius:1rem;background:#D5E2DD;overflow:hidden;margin:.3rem 0 .8rem}
+.bar i{display:block;height:100%;background:var(--gold)}
+.bubble{background:#fff;border:2px solid var(--pri);border-radius:1rem 1rem 1rem .2rem;padding:.7rem 1rem;position:relative;margin:.6rem 0}
+.coachtop{display:flex;align-items:center;gap:1rem}
+.lesson{display:flex;justify-content:space-between;align-items:center;gap:.8rem;width:100%;text-align:right;min-height:3.6rem;padding:.5rem 1rem;border:2px solid var(--pri);border-radius:.9rem;background:#fff;font-weight:600;margin-bottom:.5rem}
+.lesson:hover{background:#E4F0EC}
+.lesson span:last-child{color:var(--gold);font-size:.9rem}
+.toggle{display:flex;align-items:center;gap:.7rem;margin:.8rem 0;font-weight:500}
+.toggle input{width:1.6rem;height:1.6rem;accent-color:var(--pri)}
+
+/* quiz */
+.opts{display:grid;gap:.6rem;margin-top:.8rem}
+.opt{min-height:3.6rem;padding:.5rem 1rem;border-radius:.9rem;border:2px solid var(--line);background:#fff;text-align:right;font-size:1rem;font-weight:500}
+.opt.q{font-family:"Amiri",serif;font-size:2rem;text-align:center;font-weight:700}
+.opts.letters4{grid-template-columns:repeat(2,1fr)}
+.opt:hover:not(:disabled){border-color:var(--pri)}
+.opt.right{background:var(--okbg);border-color:var(--ok)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.qtext{font-size:1.2rem;font-weight:600;line-height:1.7}
+.score{font-size:3rem;font-weight:700;color:var(--pri-d);text-align:center}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:5.6rem;z-index:90;max-width:90vw;background:var(--ink);color:#fff;padding:.7rem 1.1rem;border-radius:.8rem;font-size:.9rem}
+.notice{font-size:.95rem;color:var(--ink2);border-top:1px solid var(--line);margin-top:1.4rem;padding-top:.8rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>مخارج الحروف<small>تعلّم النطق الصحيح لتلاوة القرآن · الإصدار 7</small></h1>
+  <div class="fsb" role="group" aria-label="حجم الخط">
+    <button data-act="fs" data-d="-2" aria-label="تصغير الخط">أ−</button>
+    <button data-act="fs" data-d="2" aria-label="تكبير الخط">أ+</button>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<nav class="tabs" aria-label="التنقل">
+  <button data-act="tab" data-t="map"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>المخارج</button>
+  <button data-act="tab" data-t="letters"><svg viewBox="0 0 24 24"><path d="M4 19l5-14 5 14M6 14h6M16 9h4M18 9v10"/></svg>الحروف</button>
+  <button data-act="tab" data-t="coach"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>المعلّم</button>
+  <button data-act="tab" data-t="quiz"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 3.8M12 17h.01"/></svg>الاختبار</button>
+</nav>
+
+<div id="modal"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+/* ============ بيانات ============ */
+const GROUPS={jawf:'الجوف',halq:'الحلق',lisan:'اللسان',shafatan:'الشفتان',khayshoom:'الخيشوم'};
+
+const MK=[
+ {id:'jawf',g:'jawf',n:'الجوف',d:'الفراغ الداخلي في الفم والحلق. تخرج منه حروف المد الثلاثة: الألف بعد فتح، والواو الساكنة بعد ضم، والياء الساكنة بعد كسر. ليس له نقطة محددة يُلمسها اللسان.',L:['ا'],p:[268,222]},
+ {id:'h1',g:'halq',n:'أقصى الحلق',d:'أبعد موضع في الحلق مما يلي الصدر.',L:['ء','ه'],p:[184,372]},
+ {id:'h2',g:'halq',n:'وسط الحلق',d:'منتصف الحلق.',L:['ع','ح'],p:[184,330]},
+ {id:'h3',g:'halq',n:'أدنى الحلق',d:'أقرب موضع في الحلق مما يلي الفم.',L:['غ','خ'],p:[184,288]},
+ {id:'l1',g:'lisan',n:'أقصى اللسان مع الحنك الرخو',d:'مؤخرة اللسان مع ما يحاذيها من الحنك الرخو، وهو الجزء اللين في أعلى الفم من الخلف.',L:['ق'],p:[224,238]},
+ {id:'l2',g:'lisan',n:'أقصى اللسان — أسفل القاف قليلًا',d:'مؤخرة اللسان أيضًا، لكن أقرب إلى مقدمة الفم من مخرج القاف، مع ما يحاذيها من الحنك الأعلى.',L:['ك'],p:[243,235]},
+ {id:'l3',g:'lisan',n:'وسط اللسان',d:'وسط اللسان مع ما يحاذيه من الحنك الأعلى.',L:['ج','ش','ي'],p:[264,233]},
+ {id:'l4',g:'lisan',n:'حافة اللسان',d:'إحدى حافتي اللسان أو كلتاهما، مع الأضراس العليا المجاورة لها.',L:['ض'],p:[238,257]},
+ {id:'l5',g:'lisan',n:'حافتا اللسان إلى منتهاه',d:'من أدنى حافتي اللسان إلى منتهى طرفه، مع لثة الأسنان العليا.',L:['ل'],p:[290,239]},
+ {id:'l6',g:'lisan',n:'طرف اللسان مع لثة الثنايا العليا',d:'طرف اللسان يلمس لثة الأسنان الأمامية العليا.',L:['ن'],p:[310,237]},
+ {id:'l7',g:'lisan',n:'طرف اللسان — أدخل قليلًا من النون',d:'طرف اللسان أيضًا، لكن أدخل قليلًا نحو الداخل من موضع النون.',L:['ر'],p:[304,246]},
+ {id:'l8',g:'lisan',n:'طرف اللسان مع أصول الثنايا العليا',d:'طرف اللسان مع أصول الأسنان الأمامية العليا.',L:['ط','د','ت'],p:[322,232]},
+ {id:'l9',g:'lisan',n:'طرف اللسان مع ما بين الثنايا العليا والسفلى',d:'طرف اللسان قريب من الأسنان الأمامية، بين العليا والسفلى، فيخرج الهواء بصفير.',L:['ص','ز','س'],p:[323,253]},
+ {id:'l10',g:'lisan',n:'طرف اللسان مع أطراف الثنايا العليا',d:'طرف اللسان يلامس أطراف الأسنان الأمامية العليا.',L:['ظ','ذ','ث'],p:[331,241]},
+ {id:'s1',g:'shafatan',n:'بطن الشفة السفلى مع أطراف الثنايا العليا',d:'باطن الشفة السفلى يلامس أطراف الأسنان الأمامية العليا.',L:['ف'],p:[334,261]},
+ {id:'s2',g:'shafatan',n:'الشفتان',d:'الباء والميم: تنطبق الشفتان ثم تنفرجان. والواو: تنضم الشفتان دون انطباق كامل.',L:['ب','م','و'],p:[338,246]},
+ {id:'k',g:'khayshoom',n:'الخيشوم',d:'تجويف الأنف. منه تخرج الغنة، وهي صوت لطيف يصاحب النون والميم، ويظهر كاملًا في النون والميم المشددتين بمقدار حركتين.',L:[],show:['ن','م'],p:[262,199]}
+];
+const MKby={};MK.forEach(m=>MKby[m.id]=m);
+const mkOf={};MK.forEach(m=>m.L.forEach(c=>mkOf[c]=m));
+
+/* رموز الصفات: [0] ج/ه  [1] ش/ت/ر  [2] ع/ف  [3] ب/ن  [4] ذ/م */
+const O={j:'الجهر',h:'الهمس',s:'الشدة',t:'التوسط',r:'الرخاوة',u:'الاستعلاء',f:'الاستفال',b:'الإطباق',n:'الانفتاح',z:'الإذلاق',m:'الإصمات'};
+const DEF={
+ 'الجهر':'قوة الاعتماد على المخرج، فينحبس جريان النفس عند النطق ويظهر الصوت قويًا.',
+ 'الهمس':'ضعف الاعتماد على المخرج، فيجري النفس عند النطق. حروفه: فحثّه شخص سكت.',
+ 'الشدة':'انحباس جريان الصوت عند النطق بالحرف. حروفها: أجد قط بكت.',
+ 'التوسط':'لا ينحبس الصوت كله ولا يجري كله، بل حالة بين الشدة والرخاوة. حروفه: لن عمر.',
+ 'الرخاوة':'جريان الصوت عند النطق بالحرف لضعف الاعتماد على المخرج.',
+ 'الاستعلاء':'ارتفاع مؤخرة اللسان نحو الحنك الأعلى عند النطق، فيصير الحرف مفخمًا. حروفه: خص ضغط قظ.',
+ 'الاستفال':'انخفاض اللسان عن الحنك الأعلى عند النطق، فيصير الحرف مرققًا.',
+ 'الإطباق':'انطباق اللسان على الحنك الأعلى. حروفه: ص ض ط ظ.',
+ 'الانفتاح':'انفتاح ما بين اللسان والحنك الأعلى عند النطق.',
+ 'الإذلاق':'خفة النطق وسهولته لخروج الحرف من طرف اللسان أو الشفة. حروفه: فر من لبّ.',
+ 'الإصمات':'الحروف التي ليست من حروف الإذلاق؛ وفيها ثِقل نسبي في النطق.',
+ 'القلقلة':'اضطراب الحرف في مخرجه عند السكون حتى يُسمع له نبرة قوية. حروفها: قطب جد.',
+ 'الصفير':'صوت يشبه الصفير يصاحب الحرف عند خروجه. حروفه: ص ز س.',
+ 'التكرير':'قابلية طرف اللسان للارتعاد عند نطق الراء. يُنتبه إلى عدم المبالغة فيه.',
+ 'التفشي':'انتشار الهواء في الفم عند نطق الشين.',
+ 'الاستطالة':'امتداد الصوت من أول حافة اللسان إلى آخرها عند نطق الضاد.',
+ 'الانحراف':'ميل اللسان عن مخرجه نحو حافته عند نطق اللام.',
+ 'اللين':'خروج الحرف بسهولة ولين دون كلفة، وذلك في الواو والياء الساكنتين المفتوح ما قبلهما.',
+ 'المد واللين':'امتداد الصوت بالحرف دون تكلف. الألف حرف مد ولين، ولا تكون إلا ساكنة بعد فتح.',
+ 'الغنة':'صوت لطيف يخرج من الخيشوم، ويظهر كاملًا في النون والميم المشددتين.'
+};
+
+/* [الحرف، الاسم، الصفات، صفات إضافية، الكلمة، الهدف للتحقق، نصيحة] */
+const RAW=[
+['ء','الهمزة','jsfnm',[],'أَعُوذُ','اعوذ','انقطاع خفيف في الصوت من أقصى الحلق ثم انطلاقه. لا تضغط بقوة.'],
+['ا','الألف','jrfnm',['المد واللين'],'قَالَ','قال','افتح فمك وأطل الصوت بعد حرف مفتوح. لا يُبدأ بالألف المدية.'],
+['ب','الباء','jsfnz',['القلقلة'],'بِسْمِ','بسم','انطباق الشفتين ثم انفراجهما بقوة معتدلة.'],
+['ت','التاء','hsfnm',[],'تَوَّابًا','توابا','طرف اللسان عند أصول الثنايا العليا، دون تفخيم، وبلا اهتزاز في الصوت.'],
+['ث','الثاء','hrfnm',[],'ثُمَّ','ثم','طرف اللسان على أطراف الثنايا العليا، مع نفس خفيف دون اهتزاز الصوت.'],
+['ج','الجيم','jsfnm',['القلقلة'],'جَعَلَ','جعل','وسط اللسان مع وسط الحنك: ابدأ بانحباس ثم انفراج.'],
+['ح','الحاء','hrfnm',[],'الْحَمْدُ','الحمد','نفس خفيف من وسط الحلق دون اهتزاز في الصوت، كمن ينفخ على مرآة ليُبخّرها.'],
+['خ','الخاء','hrunm',[],'خَيْرٌ','خير','مثل الغين لكن بلا اهتزاز: احتكاك الهواء من أدنى الحلق مع تفخيم.'],
+['د','الدال','jsfnm',['القلقلة'],'الدِّينِ','الدين','موضع التاء نفسه لكنها مجهورة، وتظهر القلقلة عند السكون.'],
+['ذ','الذال','jrfnm',[],'ذَٰلِكَ','ذلك','طرف اللسان على أطراف الثنايا العليا مع اهتزاز الصوت وبلا تفخيم.'],
+['ر','الراء','jtfnz',['التكرير'],'رَبِّ','رب','طرف اللسان أدخل قليلًا من النون، دون ترعيد مبالغ فيه.'],
+['ز','الزاي','jrfnm',['الصفير'],'زُلْزِلَتِ','زلزلت','صفير واضح مع اهتزاز الصوت.'],
+['س','السين','hrfnm',['الصفير'],'سَلَامٌ','سلام','صفير خفيف دون اهتزاز الصوت وبلا تفخيم.'],
+['ش','الشين','hrfnm',['التفشي'],'شَهْرٍ','شهر','وسط اللسان مع انتشار الهواء في الفم دون اهتزاز.'],
+['ص','الصاد','hrubm',['الصفير'],'الصِّرَاطَ','الصراط','صفير مع تفخيم: ارفع مؤخرة لسانك ولا تنطقها سينًا.'],
+['ض','الضاد','jrubm',['الاستطالة'],'الضَّالِّينَ','الضالين','حافة اللسان مع الأضراس العليا بتفخيم؛ لا تجعلها دالًا مفخمة ولا ظاءً.'],
+['ط','الطاء','jsubm',['القلقلة'],'طَيْرًا','طيرا','موضع التاء والدال نفسه لكن مع الإطباق والتفخيم.'],
+['ظ','الظاء','jrubm',[],'ظَهْرَكَ','ظهرك','طرف اللسان بين أطراف الثنايا مع التفخيم والإطباق.'],
+['ع','العين','jtfnm',[],'الْعَالَمِينَ','العالمين','اعصر وسط الحلق قليلًا مع صوت مجهور. لا تحوّلها إلى همزة.'],
+['غ','الغين','jrunm',[],'غَيْرِ','غير','احتكاك مجهور من أدنى الحلق مع تفخيم، يشبه غرغرة خفيفة.'],
+['ف','الفاء','hrfnz',[],'فَصَلِّ','فصل','باطن الشفة السفلى على أطراف الثنايا العليا مع نفس خفيف.'],
+['ق','القاف','jsunm',['القلقلة'],'قُلْ','قل','مؤخرة اللسان مع الحنك الرخو بتفخيم. وعند السكون تظهر القلقلة.'],
+['ك','الكاف','hsfnm',[],'الْكَوْثَرَ','الكوثر','مؤخرة اللسان أمام موضع القاف قليلًا، وبلا تفخيم.'],
+['ل','اللام','jtfnz',['الانحراف'],'لَمْ','لم','حافتا اللسان مع لثة الثنايا العليا، وهي رقيقة في الغالب.'],
+['م','الميم','jtfnz',['الغنة'],'مَالِكِ','مالك','انطباق الشفتين مع غنة من الخيشوم.'],
+['ن','النون','jtfnz',['الغنة'],'نَعْبُدُ','نعبد','طرف اللسان مع لثة الثنايا العليا، وتظهر الغنة عند التشديد.'],
+['ه','الهاء','hrfnm',[],'هُوَ','هو','نفس لطيف من أقصى الحلق دون ضغط. فرّق بينها وبين الحاء.'],
+['و','الواو','jrfnm',['اللين'],'وَالْعَصْرِ','والعصر','ضمّ الشفتين دون انطباق كامل، ولا تبالغ في ذلك.'],
+['ي','الياء','jrfnm',['اللين'],'يَوْمِ','يوم','وسط اللسان قريب من الحنك مع جهر لطيف.']
+];
+const LET=RAW.map(r=>({c:r[0],n:r[1],code:r[2],ex:r[3],w:r[4],t:r[5],tip:r[6]}));
+const REF={'ء':[113,1,2],'ا':[12,4,2],'ب':[1,1,1],'ت':[110,3,7],'ث':[80,21,1],'ج':[2,22,2],'ح':[1,2,1],'خ':[97,3,3],'د':[1,4,3],'ذ':[2,2,1],'ر':[1,2,3],'ز':[99,1,2],'س':[97,5,1],'ش':[97,3,6],'ص':[1,6,2],'ض':[1,7,9],'ط':[105,3,3],'ظ':[94,3,3],'ع':[1,2,4],'غ':[1,7,5],'ف':[108,2,1],'ق':[112,1,1],'ك':[108,1,3],'ل':[112,3,1],'م':[1,4,1],'ن':[1,5,2],'ه':[112,1,2],'و':[103,1,1],'ي':[1,4,2]};
+const p3=n=>String(n).padStart(3,'0');
+function wbwUrl(c){const r=REF[c];return r?'https://audio.qurancdn.com/wbw/'+p3(r[0])+'_'+p3(r[1])+'_'+p3(r[2])+'.mp3':null}
+const LB={};LET.forEach(l=>LB[l.c]=l);
+function sifat(l){return [O[l.code[0]],O[l.code[1]],O[l.code[2]],O[l.code[3]],O[l.code[4]],...l.ex];}
+const ORDER=MK.flatMap(m=>m.L); /* ترتيب المخارج: الجوف ثم الحلق ثم اللسان ثم الشفتان */
+
+/* ============ أدوات ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const ar=n=>(+n).toLocaleString('ar-EG');
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let P=load('mk_prog',{}); /* نجوم كل حرف 0..3 */
+function setStars(c,s){if((P[c]||0)<s){P[c]=s;save('mk_prog',P)}}
+const stars=c=>{const s=P[c]||0;return '★'.repeat(s)+'☆'.repeat(3-s)};
+let toastT;
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,4200)}
+
+let voiceWarned=false;
+function nativeTTS(){
+  try{
+    const C=window.Capacitor;
+    if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;
+    if(C.Plugins&&C.Plugins.TextToSpeech)return C.Plugins.TextToSpeech;
+    if(C.registerPlugin)return C.registerPlugin('TextToSpeech');
+  }catch(e){}
+  return null;
+}
+let curClip=null,playTok=0;
+function clipKey(c){return String(LET.findIndex(l=>l.c===c)+1).padStart(2,'0')}
+function tryPlay(src,tok){
+  return new Promise((res,rej)=>{
+    let done=false;
+    const a=new Audio();curClip=a;
+    const fail=()=>{if(done)return;done=true;try{a.pause();a.removeAttribute('src');a.load()}catch(e){}rej(new Error('fail'))};
+    const t=setTimeout(fail,7000);
+    a.addEventListener('error',()=>{clearTimeout(t);fail()},{once:true});
+    a.addEventListener('playing',()=>{if(done)return;done=true;clearTimeout(t);res()},{once:true});
+    a.src=src;
+    const r=a.play();if(r&&r.catch)r.catch(()=>{clearTimeout(t);fail()});
+  });
+}
+async function playChain(srcs,text){
+  stopSpeak();const tok=++playTok;
+  for(const s of srcs){
+    if(!s)continue;
+    try{await tryPlay(s,tok);if(tok!==playTok&&curClip){try{curClip.pause()}catch(e){}}return}catch(e){if(tok!==playTok)return}
+  }
+  if(tok===playTok)speak(text);
+}
+function stopSpeak(){
+  playTok++;
+  if(curClip){try{curClip.pause()}catch(e){}curClip=null}
+  const T=nativeTTS();
+  if(T){try{T.stop()}catch(e){}return}
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+}
+function speakWeb(t){
+  if(!('speechSynthesis' in window)){toast('لا يوجد محرك صوت في هذا الجهاز. ثبّت Google Speech Services من متجر Play.');return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';u.rate=.75;
+  const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().startsWith('ar'));
+  if(v)u.voice=v;else if(!voiceWarned){voiceWarned=true;toast('لم أجد صوتًا عربيًا في جهازك. ثبّت صوتًا عربيًا من إعدادات الجهاز.')}
+  speechSynthesis.speak(u);
+}
+async function speakNative(T,t){
+  let last;
+  for(const lang of ['ar-SA','ar','ar-EG']){
+    try{await T.speak({text:t,lang:lang,rate:.8,pitch:1,volume:1,category:'ambient'});return}
+    catch(e){last=e;if(/cancel|interrupt|stopped/i.test(String((e&&e.message)||e)))return}
+  }
+  throw last;
+}
+function speak(t){
+  const T=nativeTTS();
+  if(!T){speakWeb(t);return}
+  Promise.resolve().then(()=>T.stop()).catch(()=>{})
+    .then(()=>speakNative(T,t))
+    .catch(e=>{
+      const m=String((e&&e.message)||e||'');
+      if(/unimplemented|not implemented|not available/i.test(m)&&window.speechSynthesis){speakWeb(t);return}
+      toast('تعذّر تشغيل الصوت ('+m+')');
+    });
+}
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+
+const norm=s=>(s||'').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'').replace(/[إأآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[^\u0621-\u064A]/g,'');
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const sim=(a,b)=>{const L=Math.max(a.length,b.length);return L?1-lev(a,b)/L:0};
+
+/* ============ الرسم ============ */
+const NP={jawf:[262,214],h1:[167,355],h2:[167,315],h3:[167,275],l1:[205,252],l2:[222,244],l3:[250,239],l4:[232,268],l5:[282,241],l6:[300,239],l7:[293,249],l8:[318,241],l9:[322,262],l10:[332,251],s1:[343,256],s2:[346,240],k:[240,150]};
+function diagram(sel){
+  const g=MKby[sel].g,p=NP[sel];
+  const z=(k,cls,shape,act)=>`<g class="zone ${cls}${g===k?' sel':''}" data-act="grp" data-g="${k}" tabindex="0" role="button" aria-label="${GROUPS[k]}">${shape}</g>`;
+  return `<svg class="dia" viewBox="30 20 410 380" role="img" aria-label="رسم مبسط لجهاز النطق">
+  <path class="head" d="M110 385 C80 320 58 260 58 190 C58 100 120 40 210 40 C290 40 340 90 345 160 L368 205 L345 215 L348 245 C352 290 332 332 282 352 L272 385 Z"/>
+  ${z('jawf','z-jawf','<ellipse cx="258" cy="238" rx="92" ry="52"/>')}
+  ${z('khayshoom','z-nose','<ellipse cx="240" cy="150" rx="88" ry="28"/>')}
+  ${z('halq','z-throat','<rect x="145" y="255" width="46" height="125" rx="22"/>')}
+  ${z('lisan','z-tongue','<path d="M192 276 Q205 238 255 236 Q310 232 332 246 Q326 274 290 286 Q236 298 192 276 Z"/>')}
+  ${z('shafatan','z-lips','<ellipse cx="346" cy="226" rx="19" ry="11"/><ellipse cx="344" cy="256" rx="20" ry="12"/><ellipse cx="345" cy="241" rx="17" ry="9" style="fill:transparent;stroke:none"/>')}
+  <text class="lbl" x="240" y="108" text-anchor="middle">الخيشوم</text>
+  <text class="lbl" x="268" y="212" text-anchor="middle">الجوف</text>
+  <text class="lbl" x="262" y="270" text-anchor="middle">اللسان</text>
+  <text class="lbl" x="100" y="320" text-anchor="middle">الحلق</text>
+  <text class="lbl" x="352" y="338" text-anchor="start">الشفتان</text>
+  <g class="mark" transform="translate(${p[0]} ${p[1]})"><circle class="ring" r="15"/><circle class="pt" r="7"/></g>
+  </svg>`;
+}
+
+/* ============ الحالة ============ */
+const S={tab:'map',mk:'jawf',grp:'jawf',lf:'all',modal:null};
+const C={mode:'menu',list:[],i:0,tries:0,voice:load('mk_voice',true),res:{}};
+const Q={state:'start',qs:[],i:0,sc:0,ans:null,wrong:[],best:load('mk_best',0)};
+
+/* ============ العرض ============ */
+const main=$('#main');
+function render(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-current',b.dataset.t===S.tab));
+  if(S.tab==='map')viewMap();
+  else if(S.tab==='letters')viewLetters();
+  else if(S.tab==='coach')viewCoach();
+  else viewQuiz();
+}
+
+function lettersBtns(arr){return `<div class="letters">${arr.map(c=>`<button class="lbtn quran" data-act="letter" data-c="${c}" aria-label="${LB[c].n}">${c}</button>`).join('')}</div>`}
+
+function viewMap(){
+  const m=MKby[S.mk];
+  const rows=MK.filter(x=>x.g===S.grp).map(x=>`<button class="row${x.id===S.mk?' sel':''}" data-act="mk" data-id="${x.id}"><span class="rn">${x.n}</span><span class="rl quran">${x.L.length?x.L.join(' '):'الغنة'}</span></button>`).join('');
+  const btns=Object.keys(GROUPS).map(g=>`<button class="grpbtn" data-act="grp" data-g="${g}" aria-pressed="${g===S.grp}">${GROUPS[g]}</button>`).join('');
+  const show=m.L.length?m.L:m.show;
+  main.innerHTML=`
+  <p class="lead">اضغط على جزء من الرسم، أو اختر من الأزرار.</p>
+  <div class="mapgrid">
+    <div class="stick"><div class="diaWrap" id="mapTop">${diagram(S.mk)}</div></div>
+    <div>
+      <div class="grpgrid" role="group" aria-label="اختر المخرج العام">${btns}</div>
+      ${S.grp==='lisan'||S.grp==='halq'||S.grp==='shafatan'?`<div class="rows" style="margin-bottom:1rem">${rows}</div>`:''}
+      <div class="card" aria-live="polite">
+        <h2>${m.n}</h2>
+        <p>${m.d}</p>
+        <h3>${m.L.length?'اضغط على حرف:':'الحرفان المصحوبان بالغنة، اضغط على حرف:'}</h3>
+        ${lettersBtns(show)}
+      </div>
+    </div>
+  </div>
+  <p class="notice">هذا التطبيق عون على التعلّم، ولا يغني عن القراءة على معلّم متقن.</p>`;
+}
+
+function viewLetters(){
+  const pills=[['all','الكل'],...Object.entries(GROUPS).filter(([g])=>g!=='khayshoom')].map(([g,n])=>`<button class="pill" data-act="lf" data-g="${g}" aria-pressed="${g===S.lf}">${n}</button>`).join('');
+  const list=LET.filter(l=>S.lf==='all'||mkOf[l.c].g===S.lf);
+  main.innerHTML=`
+  <p class="lead">اضغط على أي حرف لتتعلّمه. النجوم تُظهر تقدمك.</p>
+  <div class="pills" role="group" aria-label="تصفية الحروف">${pills}</div>
+  <div class="grid">${list.map(l=>`<button class="tile" data-act="letter" data-c="${l.c}"><span class="quran">${l.c}</span><small>${l.n}</small><span class="stars" aria-label="${P[l.c]||0} من 3 نجوم">${stars(l.c)}</span></button>`).join('')}</div>`;
+}
+
+/* ---- نافذة الحرف ---- */
+function openLetter(c){
+  S.modal=c;const l=LB[c],m=mkOf[c];
+  const chips=sifat(l).map(s=>`<button class="chip" data-act="def" data-k="${s}" aria-pressed="false">${s}</button>`).join('');
+  $('#modal').innerHTML=`<div class="ov" data-act="ovclose"><div class="sheet" role="dialog" aria-modal="true" aria-label="تفاصيل حرف ${l.n}">
+    <button class="close" data-act="close" aria-label="إغلاق">×</button>
+    <div class="lhead"><div class="big quran">${l.c}</div><div><h2>${l.n}</h2><p style="margin:0;color:var(--ink2)">من ${GROUPS[m.g]}</p></div></div>
+    <div class="diaWrap mini" style="margin:.6rem 0">${diagram(m.id)}</div>
+    <p>${m.d}</p>
+    <h3 style="color:var(--pri-d);margin:1rem 0 .4rem">مثال من القرآن</h3>
+    <div class="exword"><span class="quran">${l.w}</span><button class="btn" data-act="say" data-v="${l.w}" data-a="${clipKey(l.c)}" data-c="${l.c}"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>استمع</button></div>
+    <h3 style="color:var(--pri-d);margin:1rem 0 .4rem">صفات الحرف</h3>
+    <div class="chips">${chips}</div>
+    <div class="defbox" id="defbox" aria-live="polite">اضغط على صفة ليظهر معناها هنا.</div>
+    <div class="tipbox"><b>كيف تنطقه؟</b> ${l.tip}</div>
+    <h3 style="color:var(--pri-d);margin:1rem 0 .4rem">تدرّب الآن</h3>
+    <div id="micbox"></div>
+  </div></div>`;
+  document.body.style.overflow='hidden';
+  mountMic($('#micbox'),l,{onDone:ev=>{if(ev.kind==='great')setStars(c,3);else if(ev.kind==='close'||ev.kind==='self-ok')setStars(c,Math.max(1,P[c]||0))}});
+  $('.close').focus();
+}
+function closeModal(){S.modal=null;$('#modal').innerHTML='';document.body.style.overflow='';stopSpeak();if(activeListener){activeListener.stop();activeListener=null}if(S.tab==='letters'||S.tab==='map')render()}
+
+/* ============ الميكروفون ============ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let activeListener=null;
+
+function createListener(onLevel){
+  let stream,ac,raf,mr,rec,timer,stopped=false,mrDone=Promise.resolve(),recDone=Promise.resolve(),res;
+  const chunks=[],alts=[];let peak=0,srErr=null;
+  const done=new Promise(r=>res=r);
+  async function start(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){res({fatal:'unsupported'});return false}
+    try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}
+    catch(e){res({fatal:e.name||'error'});return false}
+    try{
+      ac=new (window.AudioContext||window.webkitAudioContext)();
+      const src=ac.createMediaStreamSource(stream),an=ac.createAnalyser();an.fftSize=1024;src.connect(an);
+      const buf=new Uint8Array(an.fftSize);
+      const tick=()=>{an.getByteTimeDomainData(buf);let m=0;for(const v of buf){const d=Math.abs(v-128)/128;if(d>m)m=d}peak=Math.max(peak,m);onLevel&&onLevel(m);raf=requestAnimationFrame(tick)};
+      tick();
+    }catch(e){}
+    if(window.MediaRecorder){try{mr=new MediaRecorder(stream);mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mrDone=new Promise(r=>mr.addEventListener('stop',r));mr.start()}catch(e){mr=null}}
+    if(SR){
+      try{
+        rec=new SR();rec.lang='ar-SA';rec.interimResults=false;rec.maxAlternatives=5;rec.continuous=false;
+        recDone=new Promise(r=>rec.addEventListener('end',r));
+        rec.onresult=e=>{for(const r of e.results)for(const a of r)alts.push(a.transcript)};
+        rec.onerror=e=>{srErr=e.error};
+        rec.addEventListener('end',()=>finish());
+        rec.start();
+      }catch(e){srErr='start';rec=null}
+    }
+    timer=setTimeout(finish,8000);
+    return true;
+  }
+  async function finish(){
+    if(stopped)return;stopped=true;clearTimeout(timer);cancelAnimationFrame(raf);
+    try{rec&&rec.stop()}catch(e){}
+    try{if(mr&&mr.state!=='inactive')mr.stop()}catch(e){}
+    await Promise.race([Promise.all([mrDone,recDone]),new Promise(r=>setTimeout(r,2500))]);
+    try{ac&&ac.close()}catch(e){}
+    stream&&stream.getTracks().forEach(t=>t.stop());
+    const blob=chunks.length?new Blob(chunks,{type:(mr&&mr.mimeType)||'audio/webm'}):null;
+    res({alts,peak,srErr,hasSR:!!rec,url:blob?URL.createObjectURL(blob):null});
+  }
+  return {start,stop:finish,done};
+}
+
+/* ---- الميكروفون الأصلي في تطبيق الأندرويد ---- */
+function nativePlugin(){
+  try{
+    const C=window.Capacitor;
+    if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;
+    if(C.Plugins&&C.Plugins.SpeechRecognition)return C.Plugins.SpeechRecognition;
+    if(C.registerPlugin)return C.registerPlugin('SpeechRecognition');
+  }catch(e){}
+  return null;
+}
+function isNative(){return !!nativePlugin()}
+function createNativeListener(onLevel){
+  const N=nativePlugin();
+  let res,fake,guard,stopped=false;
+  const done=new Promise(r=>res=r);
+  function finish(alts,err){
+    if(stopped)return;stopped=true;clearInterval(fake);clearTimeout(guard);
+    res({alts:alts||[],peak:.5,srErr:err?'error':null,nativeErr:err||null,hasSR:true,url:null,native:true});
+  }
+  async function start(){
+    try{
+      const av=await N.available();
+      if(!av||!av.available){res({fatal:'nospeechservice'});return false}
+      let p=await N.checkPermissions();
+      if(!p||p.speechRecognition!=='granted'){p=await N.requestPermissions();if(!p||p.speechRecognition!=='granted'){res({fatal:'NotAllowedError'});return false}}
+    }catch(e){res({fatal:'nativeerr',detail:String((e&&e.message)||e)});return false}
+    fake=setInterval(()=>onLevel&&onLevel(.3+Math.random()*.3),120);
+    guard=setTimeout(()=>{try{N.stop()}catch(e){}setTimeout(()=>finish([]),1500)},12000);
+    N.start({language:'ar-SA',maxResults:5,prompt:'انطق الكلمة',partialResults:false,popup:false})
+      .then(r=>finish((r&&r.matches)||[])).catch(e=>finish([],String((e&&e.message)||e||'error')));
+    return true;
+  }
+  async function stop(){try{await N.stop()}catch(e){}setTimeout(()=>finish([]),1500)}
+  return {start,stop,done};
+}
+
+function evaluate(l,r){
+  if(r.fatal)return {kind:'fatal',why:r.fatal,detail:r.detail};
+  if(r.native&&r.nativeErr&&!r.alts.length){const e=String(r.nativeErr).toLowerCase();if(/no match|no speech|speech timeout|7|6/.test(e))return {kind:'nospeech'};return {kind:'nativeerr',msg:r.nativeErr}}
+  if(r.peak<0.04)return {kind:'silent'};
+  if(!r.hasSR)return {kind:'nosr'};
+  if(r.srErr==='not-allowed'||r.srErr==='service-not-allowed')return {kind:'srblocked'};
+  if(!r.alts.length)return {kind:'nospeech'};
+  const t=norm(l.t);let best=0,heard=r.alts[0];
+  for(const a of r.alts){const n=norm(a);const s=n.includes(t)&&t.length>=2?1:sim(n,t);if(s>best){best=s;heard=a}}
+  return {kind:best>=.99?'great':best>=.6?'close':'miss',heard,best};
+}
+
+function mountMic(box,l,opt){
+  box.innerHTML=`<div>
+    <button class="btn rec" data-act="rec"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg><span class="rl">اضغط ثم انطق «${l.w}»</span></button>
+    <div class="meter" aria-hidden="true"><i></i></div>
+    <div class="vbox" aria-live="polite"></div>
+    <div class="abox"></div>
+    <p class="fine">التحقق تقريبي: يتأكد أنك نطقت الكلمة المطلوبة فقط. للتصحيح الدقيق اقرأ على معلّم متقن.</p>
+  </div>`;
+  const btn=$('.rec',box),lab=$('.rl',btn),bar=$('.meter i',box),vb=$('.vbox',box),ab=$('.abox',box);
+  let ls=null;
+  const idle=()=>{btn.classList.remove('live');lab.textContent='اضغط ثم انطق «'+l.w+'»';bar.style.width='0'};
+  const say=(cls,html)=>{vb.innerHTML=`<div class="verdict ${cls}">${html}</div>`};
+  btn.addEventListener('click',async()=>{
+    if(ls){ls.stop();return}
+    stopSpeak();
+    vb.innerHTML='';ab.innerHTML='';
+    ls=(isNative()?createNativeListener:createListener)(v=>{bar.style.width=Math.min(100,v*160)+'%'});activeListener=ls;
+    btn.classList.add('live');lab.textContent='جارٍ الاستماع… تكلّم الآن، واضغط للإيقاف';
+    const ok=await ls.start();
+    const cur=ls;
+    const r=await cur.done;ls=null;activeListener=null;idle();
+    const ev=evaluate(l,r);
+    if(r.url)ab.innerHTML=`<audio controls src="${r.url}" aria-label="تسجيل نطقك"></audio>`;
+    const w=l.w;
+    if(ev.kind==='fatal'){
+      let m='تعذّر تشغيل الميكروفون.';
+      if(ev.why==='NotAllowedError'||ev.why==='SecurityError')m='لم يُسمح للتطبيق باستخدام الميكروفون. اضغط على رمز القفل أو الإعدادات بجوار عنوان الصفحة، فعّل الميكروفون، ثم أعد المحاولة.';
+      else if(ev.why==='NotFoundError')m='لم أجد ميكروفونًا في جهازك. وصّل ميكروفونًا ثم أعد المحاولة.';
+      else if(ev.why==='nospeechservice')m='خدمة التعرّف على الكلام غير متوفرة في هاتفك. ثبّت تطبيق Google أو حدّثه من متجر Play، وفعّل الكتابة الصوتية بالعربية من إعدادات لوحة المفاتيح، ثم أعد المحاولة.';
+      else if(ev.why==='nativeerr')m='تعذّر تشغيل التعرّف على الكلام: '+(ev.detail||'');
+      else if(ev.why==='unsupported')m='هذا المتصفح أو طريقة فتح الملف لا تسمح بالميكروفون. افتح الملف في Chrome أو Edge أو Safari الحديث.';
+      say('err',m);
+    }
+    else if(ev.kind==='silent')say('err','لم يصل صوتك. قرّب الميكروفون وتكلّم بصوت أوضح، ثم أعد المحاولة.');
+    else if(ev.kind==='srblocked')say('info','سُجّل صوتك، لكن المتصفح منع خدمة التعرّف على الكلام. جرّب فتح الصفحة بعنوان https أو من خلال خادم محلي. يمكنك الآن الاستماع لتسجيلك ومقارنته بالمثال.'+selfBtns());
+    else if(ev.kind==='nosr')say('info','سُجّل صوتك. متصفحك لا يدعم التعرّف على الكلام، لذلك استمع إلى تسجيلك وقارنه بالمثال بنفسك.'+selfBtns());
+    else if(ev.kind==='nativeerr')say('err','تعذّر التعرّف على الكلام: '+ev.msg+'. تأكد من اتصال الإنترنت ومن تحديث تطبيق Google.');
+    else if(ev.kind==='nospeech')say('miss','سمعتُ صوتًا لكني لم أتبيّن كلمة. انطق «'+w+'» بوضوح وبطء. '+l.tip);
+    else if(ev.kind==='great')say('great','<b>أحسنت!</b> سمعتُ «'+ev.heard+'» وهي الكلمة المطلوبة.');
+    else if(ev.kind==='close')say('close','<b>قريب جدًا.</b> سمعتُ «'+ev.heard+'» والمطلوب «'+w+'». '+l.tip);
+    else say('miss','سمعتُ «'+ev.heard+'» والمطلوب «'+w+'». راجع المخرج وأعد المحاولة. '+l.tip);
+    opt.onDone&&opt.onDone(ev);
+  });
+  box.addEventListener('click',e=>{const s=e.target.closest('[data-act="self"]');if(!s)return;
+    const ok=s.dataset.ok==='1';
+    vb.innerHTML=`<div class="verdict ${ok?'great':'close'}">${ok?'جميل، سجّلتُ تقدمك.':'لا بأس، أعد الاستماع إلى المثال ثم جرّب مرة أخرى.'}</div>`;
+    opt.onDone&&opt.onDone({kind:ok?'self-ok':'self-retry'});
+  });
+  function selfBtns(){return '<div class="btns"><button class="btn pri" data-act="self" data-ok="1">نطقتها كما سمعت</button><button class="btn" data-act="self" data-ok="0">أحتاج إعادة</button></div>'}
+}
+
+/* ============ المعلّم ============ */
+function lessons(){
+  const byG=g=>ORDER.filter(c=>mkOf[c].g===g);
+  const need=ORDER.filter(c=>(P[c]||0)<3);
+  return [
+    {k:'all',t:'كل الحروف بترتيب المخارج',l:ORDER},
+    {k:'halq',t:'حروف الحلق',l:byG('halq')},
+    {k:'lisan',t:'حروف اللسان',l:byG('lisan')},
+    {k:'shafatan',t:'حروف الشفتين',l:byG('shafatan')},
+    {k:'jawf',t:'حرف المد (الجوف)',l:byG('jawf')},
+    {k:'need',t:'ما لم أتقنه بعد',l:need.length?need:ORDER}
+  ];
+}
+function viewCoach(){
+  if(C.mode==='menu'){
+    main.innerHTML=`
+    <div class="card">
+      <h2>المعلّم</h2>
+      <p>يرافقك المعلّم حرفًا حرفًا: يشرح لك المخرج، وتسمع المثال، ثم تنطق أنت ويتحقق من نطقك ويعطيك نصيحة محددة لذلك الحرف.</p>
+      <label class="toggle"><input type="checkbox" id="vtog" ${C.voice?'checked':''}> المعلّم يقرأ الشرح بصوته</label>
+    </div>
+    <h3 style="margin:0 0 .5rem;color:var(--pri-d)">اختر درسًا</h3>
+    ${lessons().map(x=>`<button class="lesson" data-act="cstart" data-k="${x.k}"><span>${x.t}</span><span>${ar(x.l.length)} حرفًا</span></button>`).join('')}
+    <p class="notice">يعمل الميكروفون بعد أن تسمح للمتصفح باستخدامه. الأفضل أن تجلس في مكان هادئ وتقرّب الجهاز منك.</p>`;
+    const vt=$('#vtog');vt&&vt.addEventListener('change',()=>{C.voice=vt.checked;save('mk_voice',C.voice)});
+    return;
+  }
+  if(C.mode==='done'){
+    const items=C.list.map(c=>`<span class="lbtn quran" style="width:auto;padding:0 .8rem;gap:.4rem"><span>${c}</span><small class="stars" style="font-family:inherit">${stars(c)}</small></span>`).join('');
+    main.innerHTML=`<div class="card"><h2>أتممتَ الدرس، بارك الله فيك</h2><p>هذه نتيجتك في حروف الدرس:</p><div class="letters">${items}</div>
+    <div class="btns"><button class="btn pri" data-act="cmenu">درس آخر</button><button class="btn" data-act="tab" data-t="quiz">اختبر نفسك</button></div></div>`;
+    return;
+  }
+  const c=C.list[C.i],l=LB[c],m=mkOf[c];
+  const pct=Math.round(C.i/C.list.length*100);
+  main.innerHTML=`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;font-weight:600;font-size:.9rem"><span>الحرف ${ar(C.i+1)} من ${ar(C.list.length)}</span><button class="btn" style="min-height:2.4rem;padding:.1rem .8rem" data-act="cmenu">إنهاء الدرس</button></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="coachtop"><div class="big quran">${l.c}</div><div><h2>${l.n}</h2><div class="exword" style="padding:.1rem .8rem;margin-top:.3rem"><span class="quran" style="font-size:1.9rem">${l.w}</span></div></div></div>
+    <div class="bubble" id="cmsg" aria-live="polite">${introText(l,m)}</div>
+    <div class="btns"><button class="btn" data-act="say" data-v="${l.w}" data-a="${clipKey(l.c)}" data-c="${l.c}"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>استمع للمثال</button>
+    <button class="btn" data-act="say" data-v="${l.n}. ${m.n}. ${l.tip}">أعد الشرح بصوت المعلّم</button></div>
+    <h3>دورك: انطق الكلمة</h3>
+    <div id="cmic"></div>
+    <div class="btns" id="cnav"><button class="btn" data-act="cnext" data-skip="1">تخطَّ هذا الحرف</button></div>
+  </div>`;
+  mountMic($('#cmic'),l,{onDone:ev=>coachDone(l,ev)});
+  if(C.voice)speak(`الحرف ${l.n}. يخرج من ${m.n}. ${l.tip}`);
+}
+const introText=(l,m)=>`<b>الحرف «${l.n}»</b> يخرج من <b>${m.n}</b>. ${m.d}<br>${l.tip}<br><span style="color:var(--ink2)">استمع إلى المثال أولًا، ثم اضغط زر الميكروفون وكرّر الكلمة.</span>`;
+function coachDone(l,ev){
+  const msg=$('#cmsg'),nav=$('#cnav');if(!msg)return;
+  const good=ev.kind==='great'||ev.kind==='self-ok',near=ev.kind==='close';
+  if(['fatal','silent','self-retry','nosr','srblocked'].includes(ev.kind))return;
+  if(good||near){setStars(l.c,ev.kind==='great'?(C.tries===0?3:2):1)}
+  else C.tries++;
+  if(good){msg.innerHTML='<b>ممتاز!</b> أتقنتَ هذه الكلمة. هيا إلى الحرف التالي.';if(C.voice)speak('أحسنت')}
+  else if(near){msg.innerHTML='<b>قريب جدًا.</b> كرّر مرة أخرى بوضوح أكبر، أو انتقل إلى الحرف التالي.';if(C.voice)speak('قريب جدًا، أعد المحاولة')}
+  else if(C.tries>=3){msg.innerHTML='لا بأس، سننتقل الآن ونعود إلى هذا الحرف لاحقًا في «ما لم أتقنه بعد». الإتقان يحتاج صبرًا وتكرارًا.'}
+  else{msg.innerHTML=`حاول مرة أخرى. ${l.tip}`;if(C.voice)speak('حاول مرة أخرى')}
+  const last=C.i===C.list.length-1;
+  nav.innerHTML=`<button class="btn pri" data-act="cnext">${last?'إنهاء الدرس':'الحرف التالي'}</button>`+(good?'':'<button class="btn" data-act="cretry">أعد المحاولة</button>');
+}
+
+/* ============ الاختبار ============ */
+const SETS=[
+ ['حروف القلقلة',l=>l.ex.includes('القلقلة')],['حروف الصفير',l=>l.ex.includes('الصفير')],
+ ['حروف الاستعلاء',l=>l.code[2]==='u'],['حروف الإطباق',l=>l.code[3]==='b'],
+ ['الحروف المهموسة',l=>l.code[0]==='h'],['حروف الإذلاق',l=>l.code[4]==='z'],['الحروف الشديدة',l=>l.code[1]==='s']
+];
+const PAIRS=[[0,'الجهر والهمس','jh'],[1,'الشدة والتوسط والرخاوة','str'],[2,'الاستعلاء والاستفال','uf'],[3,'الإطباق والانفتاح','bn'],[4,'الإذلاق والإصمات','zm']];
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function buildQuiz(){
+  const qs=[];const types=shuf(['mk','mk','mk','sf','sf','sf','who','who','ex','ex']);
+  for(const t of types){
+    if(t==='mk'){
+      const l=rnd(LET.filter(x=>!['و','ي'].includes(x.c)));const m=mkOf[l.c];
+      const ds=shuf(MK.filter(x=>x.id!==m.id&&x.id!=='k'&&x.n!==m.n)).slice(0,3);
+      qs.push({q:`من أي مخرج يخرج حرف «${l.c}»؟`,o:shuf([m,...ds]).map(x=>x.n),a:m.n,e:`حرف ${l.n} يخرج من ${m.n}.`,tl:false});
+    }else if(t==='sf'){
+      const [i,title,key]=rnd(PAIRS);const l=rnd(LET);const ans=O[l.code[i]];
+      const opts=[...new Set(LET.map(x=>O[x.code[i]]))];
+      qs.push({q:`الحرف «${l.c}»: ما صفته في ${title}؟`,o:shuf(opts),a:ans,e:`${l.n} من صفاته ${ans}.`,tl:false});
+    }else if(t==='who'){
+      const [name,f]=rnd(SETS);const inn=LET.filter(f).map(x=>x.c),out=LET.map(x=>x.c).filter(c=>!inn.includes(c));
+      const a=rnd(inn);
+      qs.push({q:`أي هذه الحروف من ${name}؟`,o:shuf([a,...shuf(out).slice(0,3)]),a,e:`${name}: ${inn.join('، ')}.`,tl:true});
+    }else{
+      const m=rnd(MK.filter(x=>x.L.length&&x.id!=='jawf'));const a=rnd(m.L);
+      const out=LET.map(x=>x.c).filter(c=>!m.L.includes(c)&&c!=='ا');
+      qs.push({q:`أي هذه الحروف يخرج من «${m.n}»؟`,o:shuf([a,...shuf(out).slice(0,3)]),a,e:`يخرج من ${m.n}: ${m.L.join('، ')}.`,tl:true});
+    }
+  }
+  return qs;
+}
+function viewQuiz(){
+  if(Q.state==='start'){
+    main.innerHTML=`<div class="card"><h2>اختبر نفسك</h2><p>عشرة أسئلة متنوعة عن المخارج والصفات. بعد كل إجابة يظهر التصحيح مع الشرح.</p>${Q.best?`<p style="color:var(--gold);font-weight:600">أفضل نتيجة لك: ${ar(Q.best)} من ${ar(10)}</p>`:''}<div class="btns"><button class="btn pri" data-act="qstart">ابدأ الاختبار</button></div></div>`;return;
+  }
+  if(Q.state==='done'){
+    const msg=Q.sc===10?'ما شاء الله! إتقان كامل.':Q.sc>=7?'نتيجة جيدة جدًا. راجع ما أخطأتَ فيه ثم أعد الاختبار.':'بداية طيبة. راجع الحروف والمخارج ثم جرّب من جديد.';
+    main.innerHTML=`<div class="card"><h2>نتيجتك</h2><div class="score">${ar(Q.sc)} / ${ar(10)}</div><p style="text-align:center">${msg}</p>
+    ${Q.wrong.length?`<h3>للمراجعة</h3>${Q.wrong.map(w=>`<p>• ${w}</p>`).join('')}`:''}
+    <div class="btns"><button class="btn pri" data-act="qstart">أعد الاختبار</button><button class="btn" data-act="tab" data-t="letters">راجع الحروف</button></div></div>`;return;
+  }
+  const q=Q.qs[Q.i];
+  main.innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;font-weight:600;font-size:.9rem"><span>السؤال ${ar(Q.i+1)} من ${ar(10)}</span><span>الصحيح: ${ar(Q.sc)}</span></div>
+    <div class="bar"><i style="width:${Q.i*10}%"></i></div>
+    <p class="qtext">${q.q}</p>
+    <div class="opts${q.tl?' letters4':''}" id="opts">${q.o.map((o,i)=>`<button class="opt${q.tl?' q':''}" data-act="qans" data-i="${i}">${o}</button>`).join('')}</div>
+    <div id="qfb" aria-live="polite"></div>
+  </div>`;
+}
+function answer(i){
+  const q=Q.qs[Q.i];if(Q.ans!==null)return;Q.ans=i;
+  const ok=q.o[i]===q.a;if(ok)Q.sc++;else Q.wrong.push(q.e);
+  document.querySelectorAll('.opt').forEach((b,k)=>{b.disabled=true;if(q.o[k]===q.a)b.classList.add('right');else if(k===i)b.classList.add('wrong')});
+  const last=Q.i===9;
+  $('#qfb').innerHTML=`<div class="verdict ${ok?'great':'miss'}"><b>${ok?'إجابة صحيحة.':'إجابة غير صحيحة.'}</b> ${q.e}</div><div class="btns"><button class="btn pri" data-act="qnext">${last?'عرض النتيجة':'السؤال التالي'}</button></div>`;
+  $('#qfb .btn').focus();
+}
+
+/* ============ الأحداث ============ */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act;
+  if(a==='ovclose'){if(e.target===el)closeModal();return}
+  if(a==='tab'){if(S.modal)closeModal();S.tab=el.dataset.t;render();window.scrollTo(0,0)}
+  else if(a==='mk'){if(S.modal)return;S.mk=el.dataset.id;S.grp=MKby[S.mk].g;render();const t=$('#mapTop');if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({behavior:'smooth',block:'start'})}
+  else if(a==='grp'){if(S.modal)return;S.grp=el.dataset.g;const f=MK.find(m=>m.g===S.grp);S.mk=f.id;render()}
+  else if(a==='lf'){S.lf=el.dataset.g;render()}
+  else if(a==='letter')openLetter(el.dataset.c);
+  else if(a==='close')closeModal();
+  else if(a==='say'){if(el.dataset.c){const c=el.dataset.c;playChain(['audio/'+clipKey(c)+'.mp3',wbwUrl(c)],el.dataset.v)}else speak(el.dataset.v)}
+  else if(a==='def'){document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===el));$('#defbox').innerHTML=`<b>${el.dataset.k}:</b> ${DEF[el.dataset.k]||''}`}
+  else if(a==='fs'){const cur=parseInt(getComputedStyle(document.documentElement).fontSize);setFs(cur+parseInt(el.dataset.d))}
+  else if(a==='cstart'){const x=lessons().find(l=>l.k===el.dataset.k);C.list=x.l;C.i=0;C.tries=0;C.mode='run';render();window.scrollTo(0,0)}
+  else if(a==='cnext'){C.i++;C.tries=0;if(C.i>=C.list.length)C.mode='done';render();window.scrollTo(0,0)}
+  else if(a==='cretry'){C.tries=0;const m=$('#cmic .rec');m&&m.click()}
+  else if(a==='cmenu'){C.mode='menu';stopSpeak();render()}
+  else if(a==='qstart'){Q.qs=buildQuiz();Q.i=0;Q.sc=0;Q.ans=null;Q.wrong=[];Q.state='run';render()}
+  else if(a==='qans')answer(+el.dataset.i);
+  else if(a==='qnext'){Q.i++;Q.ans=null;if(Q.i>=10){Q.state='done';if(Q.sc>Q.best){Q.best=Q.sc;save('mk_best',Q.best)}}render();window.scrollTo(0,0)}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&S.modal)closeModal();
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g[data-act]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+});
+function setFs(px){px=Math.max(20,Math.min(32,px));document.documentElement.style.setProperty('--fs',px+'px');save('mk_fs',px)}
+setFs(load('mk_fs',22));
+render();
+</script>
+</body>
+</html>
