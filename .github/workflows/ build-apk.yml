@@ -16,11 +16,15 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
+      - name: Add voice (text to speech) plugin
+        run: npm install @capacitor-community/text-to-speech@5 --legacy-peer-deps
       - name: Add Android project
         run: npx cap add android
       - name: Allow microphone and speech recognition
         run: python3 scripts/patch_android.py
+      - name: Allow voice engine lookup
+        run: sed -i 's#</queries>#<intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>#' android/app/src/main/AndroidManifest.xml
       - name: Copy web files
         run: npx cap sync android
       - name: Build debug APK
