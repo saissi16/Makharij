@@ -431,26 +431,35 @@ function createListener(onLevel){
 }
 
 /* ---- الميكروفون الأصلي في تطبيق الأندرويد ---- */
-function isNative(){try{return !!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition)}catch(e){return false}}
+function nativePlugin(){
+  try{
+    const C=window.Capacitor;
+    if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;
+    if(C.Plugins&&C.Plugins.SpeechRecognition)return C.Plugins.SpeechRecognition;
+    if(C.registerPlugin)return C.registerPlugin('SpeechRecognition');
+  }catch(e){}
+  return null;
+}
+function isNative(){return !!nativePlugin()}
 function createNativeListener(onLevel){
-  const N=window.Capacitor.Plugins.SpeechRecognition;
+  const N=nativePlugin();
   let res,fake,guard,stopped=false;
   const done=new Promise(r=>res=r);
   function finish(alts,err){
     if(stopped)return;stopped=true;clearInterval(fake);clearTimeout(guard);
-    res({alts:alts||[],peak:.5,srErr:err?'error':null,hasSR:true,url:null});
+    res({alts:alts||[],peak:.5,srErr:err?'error':null,nativeErr:err||null,hasSR:true,url:null,native:true});
   }
   async function start(){
     try{
       const av=await N.available();
-      if(!av||!av.available){res({fatal:'unsupported'});return false}
+      if(!av||!av.available){res({fatal:'nospeechservice'});return false}
       let p=await N.checkPermissions();
       if(!p||p.speechRecognition!=='granted'){p=await N.requestPermissions();if(!p||p.speechRecognition!=='granted'){res({fatal:'NotAllowedError'});return false}}
-    }catch(e){res({fatal:'unsupported'});return false}
+    }catch(e){res({fatal:'nativeerr',detail:String((e&&e.message)||e)});return false}
     fake=setInterval(()=>onLevel&&onLevel(.3+Math.random()*.3),120);
     guard=setTimeout(()=>{try{N.stop()}catch(e){}setTimeout(()=>finish([]),1500)},12000);
     N.start({language:'ar-SA',maxResults:5,prompt:'انطق الكلمة',partialResults:false,popup:false})
-      .then(r=>finish((r&&r.matches)||[])).catch(e=>finish([],'error'));
+      .then(r=>finish((r&&r.matches)||[])).catch(e=>finish([],String((e&&e.message)||e||'error')));
     return true;
   }
   async function stop(){try{await N.stop()}catch(e){}setTimeout(()=>finish([]),1500)}
@@ -458,7 +467,8 @@ function createNativeListener(onLevel){
 }
 
 function evaluate(l,r){
-  if(r.fatal)return {kind:'fatal',why:r.fatal};
+  if(r.fatal)return {kind:'fatal',why:r.fatal,detail:r.detail};
+  if(r.native&&r.nativeErr&&!r.alts.length){const e=String(r.nativeErr).toLowerCase();if(/no match|no speech|speech timeout|7|6/.test(e))return {kind:'nospeech'};return {kind:'nativeerr',msg:r.nativeErr}}
   if(r.peak<0.04)return {kind:'silent'};
   if(!r.hasSR)return {kind:'nosr'};
   if(r.srErr==='not-allowed'||r.srErr==='service-not-allowed')return {kind:'srblocked'};
@@ -496,12 +506,15 @@ function mountMic(box,l,opt){
       let m='تعذّر تشغيل الميكروفون.';
       if(ev.why==='NotAllowedError'||ev.why==='SecurityError')m='لم يُسمح للتطبيق باستخدام الميكروفون. اضغط على رمز القفل أو الإعدادات بجوار عنوان الصفحة، فعّل الميكروفون، ثم أعد المحاولة.';
       else if(ev.why==='NotFoundError')m='لم أجد ميكروفونًا في جهازك. وصّل ميكروفونًا ثم أعد المحاولة.';
+      else if(ev.why==='nospeechservice')m='خدمة التعرّف على الكلام غير متوفرة في هاتفك. ثبّت تطبيق Google أو حدّثه من متجر Play، وفعّل الكتابة الصوتية بالعربية من إعدادات لوحة المفاتيح، ثم أعد المحاولة.';
+      else if(ev.why==='nativeerr')m='تعذّر تشغيل التعرّف على الكلام: '+(ev.detail||'');
       else if(ev.why==='unsupported')m='هذا المتصفح أو طريقة فتح الملف لا تسمح بالميكروفون. افتح الملف في Chrome أو Edge أو Safari الحديث.';
       say('err',m);
     }
     else if(ev.kind==='silent')say('err','لم يصل صوتك. قرّب الميكروفون وتكلّم بصوت أوضح، ثم أعد المحاولة.');
     else if(ev.kind==='srblocked')say('info','سُجّل صوتك، لكن المتصفح منع خدمة التعرّف على الكلام. جرّب فتح الصفحة بعنوان https أو من خلال خادم محلي. يمكنك الآن الاستماع لتسجيلك ومقارنته بالمثال.'+selfBtns());
     else if(ev.kind==='nosr')say('info','سُجّل صوتك. متصفحك لا يدعم التعرّف على الكلام، لذلك استمع إلى تسجيلك وقارنه بالمثال بنفسك.'+selfBtns());
+    else if(ev.kind==='nativeerr')say('err','تعذّر التعرّف على الكلام: '+ev.msg+'. تأكد من اتصال الإنترنت ومن تحديث تطبيق Google.');
     else if(ev.kind==='nospeech')say('miss','سمعتُ صوتًا لكني لم أتبيّن كلمة. انطق «'+w+'» بوضوح وبطء. '+l.tip);
     else if(ev.kind==='great')say('great','<b>أحسنت!</b> سمعتُ «'+ev.heard+'» وهي الكلمة المطلوبة.');
     else if(ev.kind==='close')say('close','<b>قريب جدًا.</b> سمعتُ «'+ev.heard+'» والمطلوب «'+w+'». '+l.tip);
