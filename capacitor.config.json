@@ -1,0 +1,6 @@
+{
+  "appId": "app.makharij.tajweed",
+  "appName": "مخارج الحروف",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
